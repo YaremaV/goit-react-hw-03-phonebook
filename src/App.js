@@ -89,9 +89,6 @@ class App extends Component {
         {showModal && (
           <Modal onClose={this.toggleModal}>
             <Form onSubmit={this.addContacts} />
-            <button type="button" onClick={this.toggleModal}>
-              Close modal
-            </button>
           </Modal>
         )}
 
