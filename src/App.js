@@ -6,6 +6,7 @@ import initialContacts from './contacts.json';
 import Form from './components/Form/Form';
 import Filter from './components/Filter/Filter';
 import Layout from './components/Layout/Layout';
+import Modal from './components/Modal';
 
 class App extends Component {
   static defaultProps = {};
@@ -15,7 +16,26 @@ class App extends Component {
   state = {
     contacts: initialContacts,
     filter: '',
+    showModal: false,
   };
+
+  componentDidMount() {
+    console.log('App ComponentDidMount');
+    const getCont = localStorage.getItem('contacts');
+    const parsedCont = JSON.parse(getCont);
+
+    if (parsedCont) {
+      this.setState({ getCont: parsedCont });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('ComponentDidUpdate APP');
+    if (this.state.contacts !== prevState.contacts) {
+      console.log('update');
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   addContacts = (name, number) => {
     const { contacts } = this.state;
@@ -49,33 +69,31 @@ class App extends Component {
     );
   };
 
-  componentDidMount() {
-    console.log('App ComponentDidMount');
-    const getCont = localStorage.getItem('contacts');
-    const parsedCont = JSON.parse(getCont);
-
-    console.log(parsedCont);
-
-    if (parsedCont) {
-      this.setState({ getCont: parsedCont });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log('ComponentDidUpdate APP');
-    if (this.state.contacts !== prevState.contacts) {
-      console.log('update');
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
 
   render() {
-    const { filter } = this.state;
+    console.log('App render');
+
+    const { filter, showModal } = this.state;
     const filteredContacts = this.getFilteredContacts();
 
     return (
       <Layout>
-        <Form onSubmit={this.addContacts} />
+        <button type="button" onClick={this.toggleModal}>
+          Open Phonebook
+        </button>
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <Form onSubmit={this.addContacts} />
+            <button type="button" onClick={this.toggleModal}>
+              Close modal
+            </button>
+          </Modal>
+        )}
 
         <Filter value={filter} onHandleFilter={this.changeFilter} />
 
